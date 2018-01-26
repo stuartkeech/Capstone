@@ -16,16 +16,15 @@ public class ProximityHandler {
 	private final int PULSE = 10000;  			// ns = 10us
 	private final int SPEED_OF_SOUND = 34029;	// cm/s
 	
-	private GpioControllerImpl gpio = new GpioControllerImpl();
-	private RaspiGpioProvider prov=new RaspiGpioProvider();
-	private GpioPinImpl echo = new GpioPinImpl(gpio,prov,RaspiPin.GPIO_10);
-	private GpioPinImpl trigger = new GpioPinImpl(gpio,prov,RaspiPin.GPIO_17);
+	private GpioController gpio;
+	private GpioPinDigitalInput echo;
+	private GpioPinDigitalOutput trigger;
 	
 	public ProximityHandler() {
-		//gpio = GpioFactory.getInstance();
+		gpio = GpioFactory.getInstance();
 		
-        //trigger = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_17, "PinTrigger", PinState.LOW);
-        //echo = gpio.provisionDigitalInputPin(RaspiPin.GPIO_10, "PinEcho", PinPullResistance.PULL_DOWN);
+        trigger = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_17, "PinTrigger", PinState.LOW);
+        echo = gpio.provisionDigitalInputPin(RaspiPin.GPIO_10, "PinEcho", PinPullResistance.PULL_DOWN);
         //It really doesn't make sense to me that this is pull up
         
 /*		trigger = (GPIOPin) DeviceManager.open(new GPIOPinConfig(0, triggerPin, 
