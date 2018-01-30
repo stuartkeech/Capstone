@@ -5,13 +5,10 @@ import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.GpioPinDigitalInput;
 import com.pi4j.io.gpio.PinState;
-import com.pi4j.io.gpio.RaspiGpioProvider;
 import com.pi4j.io.gpio.PinPullResistance;
 import com.pi4j.io.gpio.RaspiPin;
-import com.pi4j.io.gpio.impl.GpioControllerImpl;
-import com.pi4j.io.gpio.impl.GpioPinImpl;
 
-//GPIO17 for trigger, GPIO10 for echo
+//GPIO_00 for trigger, GPIO_02 for echo
 public class ProximityHandler {
 	private final int PULSE = 10000;  			// ns = 10us
 	private final int SPEED_OF_SOUND = 34029;	// cm/s
@@ -21,26 +18,27 @@ public class ProximityHandler {
 	private GpioPinDigitalOutput trigger;
 	
 	public ProximityHandler() {
-		gpio = GpioFactory.getInstance();
+                gpio = GpioFactory.getInstance();
 		
-        trigger = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_17, "PinTrigger", PinState.LOW);
-        echo = gpio.provisionDigitalInputPin(RaspiPin.GPIO_10, "PinEcho", PinPullResistance.PULL_DOWN);
-        //It really doesn't make sense to me that this is pull up
+                trigger = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_00, "PinTrigger", PinState.LOW);
+                echo = gpio.provisionDigitalInputPin(RaspiPin.GPIO_02, "PinEcho", PinPullResistance.PULL_DOWN);
+                //It really doesn't make sense to me that this is pull up
         
 /*		trigger = (GPIOPin) DeviceManager.open(new GPIOPinConfig(0, triggerPin, 
 				GPIOPinConfig.DIR_OUTPUT_ONLY, GPIOPinConfig.MODE_OUTPUT_PUSH_PULL,
 				       GPIOPinConfig.TRIGGER_NONE, false));
-
 		echo = (GPIOPin) DeviceManager.open(new GPIOPinConfig(0, echoPin, 
 				GPIOPinConfig.DIR_INPUT_ONLY, GPIOPinConfig.MODE_INPUT_PULL_UP, 
 				GPIOPinConfig.TRIGGER_NONE, false));*/
 	}
-	public static void main(String[] args){
+	
+	public static void main(String[] args) {
 		ProximityHandler handle=new ProximityHandler();
 		while(true){
 			System.out.println(handle.getDistance());
 		}
 	}
+	
 	public void destruct() {
 		gpio.shutdown();
 	}
@@ -49,15 +47,16 @@ public class ProximityHandler {
 		//If echo pin is high, error
 		if (echo.getState() == PinState.HIGH) return -1;
 		
-		double distance = 0;
+		long distance = 0;
 		
 		//Output 0 to trigger pin, for recommended time between samples
 		trigger.setState(PinState.LOW);
 		try {
 			Thread.sleep(50);
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			Thread.currentThread().interrupt();
+			return -4;
 		}
 		
 		//Set trigger pin to 1
@@ -74,18 +73,18 @@ public class ProximityHandler {
 		//Wait for the echo pulse to start - if low for more than 20ms, error
 		while (echo.getState() == PinState.LOW) {
 			start = System.nanoTime();
-			if (start >= startWait + 1000000L*2) return -1;
-	    }
+			if (start >= startWait + 1000000L*2) return -2;
+	        }
 		//Wait for the echo pulse to end - if high for more than 20ms, error
-	    while (echo.getState() == PinState.HIGH) {
-	        stop = System.nanoTime();
-	        if (stop >= start + 1000000L*2) return -1;
-	    }
+	        while (echo.getState() == PinState.HIGH) {
+	                stop = System.nanoTime();
+	                if (stop >= start + 1000000L*2) return -3;
+	        }
 		
 		//Length of returned pulse, in ns
-	    long diff = stop - start;
-		distance = (diff/2/1000000000L) * SPEED_OF_SOUND;
+	        long diff = stop - start;
+		distance = diff * SPEED_OF_SOUND;
 		
-		return distance;
+		return distance/2.0/(1000000000L);
 	}
 }
