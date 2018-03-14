@@ -1,45 +1,59 @@
+package capstone;
+
 import com.pi4j.io.gpio.*;
 
-// The two PWM pins are GPIO12 and GPIO13.
-
+// The two PWM pins are GPIO26 and GPIO23, pin numbers 32 and 33 respectively.
+// The current test code should spin a motor at 50% for 5 seconds, 25% for 5 seconds, then turn off.
 public class WheelMotorControl {
 	
 	//Note: max motor velocity reduced to 90% to account for max current draw of ESCs
-	private final double MAX_MOTOR_VELOCITY = 19.77*0.9;  // in m/s
-	private final int MAX_TURN_RADIUS = 20000;			  // in mm
-	private final int DRIVE_STRAIGHT = 100000;		  	  // in mm
-	private final double WHEEL_SEPARATION = 0.2;	 	  // in m
+	//With the switch to treads, the below max velocity may no longer be accurate.
+	//private final double MAX_MOTOR_VELOCITY = 19.77*0.9;  // in m/s
+	//private final int MAX_TURN_RADIUS = 20000;			  // in mm
+	//private final int DRIVE_STRAIGHT = 100000;		  	  // in mm
+	//private final double WHEEL_SEPARATION = 0.2;	 	  // in m
 	
-	private int robotRadius;
-	private double robotSpeed;
+	//private int robotRadius;
+	//private double robotSpeed;
 	
-	private final GpioController gpio;
-	private final GpioPinDigitalOutput motor1pin;
-	private final GpioPinDigitalOutput motor2pin;
+	//private GpioController gpio;
+	//private GpioPinPwmOutput motor1pin;
+	//private GpioPinPwmOutput motor2pin;
 	
 	//Just for testing purposes
-	public static void main(String[] args) throws InterruptedException {
-		gpio = GpioFactory.getInstance();
+	public static void main(String[] args) throws Exception {
+		GpioController gpio = GpioFactory.getInstance();
 		
-		motor1pin = gpio.provisionPwmOutputPin(RaspiPin.GPIO_12);
-		//motor2pin = gpio.provisionPwmOutputPin(RaspiPin.GPIO_13);
+		GpioPinPwmOutput motor1pin = gpio.provisionPwmOutputPin(RaspiPin.GPIO_26);
+		//GpioPinPwmOutput motor2pin = gpio.provisionPwmOutputPin(RaspiPin.GPIO_23);
 		
 		com.pi4j.wiringpi.Gpio.pwmSetMode(com.pi4j.wiringpi.Gpio.PWM_MODE_MS);
-        com.pi4j.wiringpi.Gpio.pwmSetRange(1000);
-        //com.pi4j.wiringpi.Gpio.pwmSetClock(500);
+        com.pi4j.wiringpi.Gpio.pwmSetRange(2000);
+        com.pi4j.wiringpi.Gpio.pwmSetClock(192);
 		
-		// Make sure motors are turned off to start
-		motor1pin.setPwm(750);
-		Thread.sleep(5000);
+        Thread.sleep(1000);
+        
+		//motor1pin.setPwm(240);
+		//motor2pin.setPwm(240);
+		//System.out.println("Connect your power");
+	    //System.in.read();
+		
+		//motor1pin.setPwm(120);
+		//motor2pin.setPwm(120);
+		//Thread.sleep(1000);
+		//motor1pin.setPwm(0);
 		//motor2pin.setPwm(0);
 		
-		motor1pin.setPwm(500);
-		Thread.sleep(5000);
-		
-		motor1pin.setPwm(250);
-		Thread.sleep(5000);
-		
-		motor1pin.setPwm(0);
+		//System.out.println("Arming");
+	    //System.in.read();
+	    //Thread.sleep(1000);
+	    
+	    motor1pin.setPwm(140);
+	    //motor2pin.setPwm(120);
+	    Thread.sleep(1500);
+	    motor1pin.setPwm(0);
+	    //motor2pin.setPwm(0);
+	    
 		gpio.shutdown();
 		
 	}
@@ -48,8 +62,8 @@ public class WheelMotorControl {
 	public WheelMotorControl() {
 		gpio = GpioFactory.getInstance();
 		
-		motor1pin = gpio.provisionPwmOutputPin(RaspiPin.GPIO_12);
-		motor2pin = gpio.provisionPwmOutputPin(RaspiPin.GPIO_13);
+		motor1pin = gpio.provisionPwmOutputPin(RaspiPin.GPIO_26);
+		motor2pin = gpio.provisionPwmOutputPin(RaspiPin.GPIO_23);
 		
 		com.pi4j.wiringpi.Gpio.pwmSetMode(com.pi4j.wiringpi.Gpio.PWM_MODE_MS);
         com.pi4j.wiringpi.Gpio.pwmSetRange(1000);
@@ -75,7 +89,7 @@ public class WheelMotorControl {
 	/*
 	 * The main function used by PathPlanning
 	 */
-	public int drive(double velocity, int radius) {
+/*	public int drive(double velocity, int radius) {
 		// Check that the arguments are within bounds
 		if (velocity > MAX_MOTOR_VELOCITY || velocity < 0 ||
 				((Math.abs(radius) < WHEEL_SEPARATION || Math.abs(radius) > MAX_TURN_RADIUS) 
@@ -124,7 +138,7 @@ public class WheelMotorControl {
 	 * The function which sets the PWM of the motors based on desired speed
 	 * These will be slightly more complex if the motors are allowed to reverse direction
 	 */
-	private void motorPWM(double motorSpeed, int motorNumber) {
+/*	private void motorPWM(double motorSpeed, int motorNumber) {
 				
 		int dutyCycle = (int) (motorSpeed*900/MAX_MOTOR_VELOCITY + 0.5);
 		
@@ -137,17 +151,17 @@ public class WheelMotorControl {
 		} else if (motorNumber == 2){
 			motor2pin.setPwm(dutyCycle);
 		}
-	}	
+	}	*/
 	
 	
 	/*
 	 * Getters!!!
 	 */
-	public int getRadius() {
+/*	public int getRadius() {
 		return robotRadius;
 	}
 	
 	public double getSpeed() {
 		return robotSpeed;
-	}
+	}*/
 }
