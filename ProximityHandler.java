@@ -1,4 +1,4 @@
-package test;
+package capstone;
 
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
@@ -8,7 +8,7 @@ import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.PinPullResistance;
 import com.pi4j.io.gpio.RaspiPin;
 
-//GPIO_00 for trigger, GPIO_02 for echo
+//GPIO_00 for trigger (pin 11), GPIO_02 for echo (pin 13)
 public class ProximityHandler {
 	private final int PULSE = 10000;  			// ns = 10us
 	private final int SPEED_OF_SOUND = 34029;	// cm/s
@@ -18,25 +18,10 @@ public class ProximityHandler {
 	private GpioPinDigitalOutput trigger;
 	
 	public ProximityHandler() {
-                gpio = GpioFactory.getInstance();
+        gpio = GpioFactory.getInstance();
 		
-                trigger = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_00, "PinTrigger", PinState.LOW);
-                echo = gpio.provisionDigitalInputPin(RaspiPin.GPIO_02, "PinEcho", PinPullResistance.PULL_DOWN);
-                //It really doesn't make sense to me that this is pull up
-        
-/*		trigger = (GPIOPin) DeviceManager.open(new GPIOPinConfig(0, triggerPin, 
-				GPIOPinConfig.DIR_OUTPUT_ONLY, GPIOPinConfig.MODE_OUTPUT_PUSH_PULL,
-				       GPIOPinConfig.TRIGGER_NONE, false));
-		echo = (GPIOPin) DeviceManager.open(new GPIOPinConfig(0, echoPin, 
-				GPIOPinConfig.DIR_INPUT_ONLY, GPIOPinConfig.MODE_INPUT_PULL_UP, 
-				GPIOPinConfig.TRIGGER_NONE, false));*/
-	}
-	
-	public static void main(String[] args) {
-		ProximityHandler handle=new ProximityHandler();
-		while(true){
-			System.out.println(handle.getDistance());
-		}
+        trigger = gpio.provisionDigitalOutputPin(RaspiPin.GPIO_00, "PinTrigger", PinState.LOW);
+        echo = gpio.provisionDigitalInputPin(RaspiPin.GPIO_02, "PinEcho", PinPullResistance.PULL_DOWN);
 	}
 	
 	public void destruct() {
@@ -74,17 +59,17 @@ public class ProximityHandler {
 		while (echo.getState() == PinState.LOW) {
 			start = System.nanoTime();
 			if (start >= startWait + 1000000L*2) return -2;
-	        }
+        }
 		//Wait for the echo pulse to end - if high for more than 20ms, error
-	        while (echo.getState() == PinState.HIGH) {
-	                stop = System.nanoTime();
-	                if (stop >= start + 1000000L*2) return -3;
-	        }
+        while (echo.getState() == PinState.HIGH) {
+            stop = System.nanoTime();
+            if (stop >= start + 1000000L*24) return -3;
+        }
 		
 		//Length of returned pulse, in ns
-	        long diff = stop - start;
-		distance = diff * SPEED_OF_SOUND;
+        long diff = stop - start;
+        distance = diff * SPEED_OF_SOUND;
 		
-		return distance/2.0/(1000000000L);
-	}
+        return distance/2.0/(1000000000L);
+    }
 }
