@@ -32,7 +32,7 @@ radio.startListening()
 
 #insert 'looking for command' function 
 
-message = list("red")
+message = list("stop")
 
 while len(message) < 32:
     message.append(0) 
