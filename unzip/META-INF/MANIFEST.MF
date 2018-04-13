@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Class-Path: . lib/opencv-310.jar lib/jrpicam-1.1.1.j
+ ar
+Main-Class: HelloCV
+

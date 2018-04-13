@@ -1,0 +1,9 @@
+#!/bin/bash
+cp capstone.jar unzip/capstone.jar
+cd unzip
+jar xf capstone.jar
+rm capstone.jar
+cd ../
+sed -i 's/331/310/g' ./unzip/META-INF/MANIFEST.MF
+sed -i 's/capstone_lib/lib/g' ./unzip/META-INF/MANIFEST.MF
+jar cvfm Capstone.jar unzip/META-INF/MANIFEST.MF -C unzip/ .
