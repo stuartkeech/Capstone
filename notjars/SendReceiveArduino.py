@@ -60,6 +60,8 @@ while(1):
         if (n >= 32 and n <= 126):
             string += chr(n)
     print("Out received message decodes to: {}".format(string))
-
+    W = open("mp2j.txt","w")
+    W.write(formart(string))
+    W.close()
     radio.stopListening()
     time.sleep(1)
