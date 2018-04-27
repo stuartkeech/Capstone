@@ -40,7 +40,7 @@ while(1):
             print("Timed out.")
             break
 
-receivedMessage = []
+    receivedMessage = []
     radio.read(receivedMessage, radio.getDynamicPayloadSize())
     print("Received: {}".format(receivedMessage))
     
