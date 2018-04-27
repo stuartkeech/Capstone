@@ -61,7 +61,7 @@ while(1):
             string += chr(n)
     print("Out received message decodes to: {}".format(string))
     W = open("mp2j.txt","w")
-    W.write(formart(string))
+    W.write(format(string))
     W.close()
     radio.stopListening()
     time.sleep(1)
