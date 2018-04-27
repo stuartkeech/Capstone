@@ -52,5 +52,5 @@ while(1):
             string += chr(n)
     print("Out received message decodes to: {}".format(string))
 
-    sradio.stopListening()
+    radio.stopListening()
     time.sleep(1)
